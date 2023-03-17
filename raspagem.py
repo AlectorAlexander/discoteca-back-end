@@ -1,5 +1,6 @@
 from parsel import Selector
 import requests
+import time
 
 
 def fetch(url):
@@ -75,35 +76,33 @@ def scrape_disco(html_content):
     return response
 
 
-def get_tech_news(amount):
-    url = "https://blog.betrybe.com/"
+def increment_urls(list_news_url, new_url):
+    new_list = scrape_cards(fetch(new_url))
+    for new in new_list:
+        list_news_url.append(new)
+    return list_news_url
+
+
+def get_discos(amount):
+    url = "https://discografia.discosdobrasil.com.br/discos"
     response = fetch(url)
-    list_news = []
-    list_news_url = scrape_novidades(response)
+    let = 0
+    list_discs = []
+    list_news_url = scrape_cards(response)
     while len(list_news_url) <= amount:
         print('adicionando novos links no array urls')
         url = scrape_next_page_link(fetch(url))
         list_news_url = increment_urls(list_news_url, url)
     for new_url in list_news_url:
-        if len(list_news) < amount:
-            new = scrape_noticia(fetch(new_url))
-            list_news.append(new)
+        print(f'ajustando {let}')
+        let += 1
+        if len(list_discs) < amount:
+            new = scrape_disco(fetch(new_url))
+            list_discs.append(new)
         else:
             break
-    create_news(list_news)
-    for i in list_news:
+    for i in list_discs:
         print(f'---{i["title"]}---')
-    print(len(list_news))
-    return list_news
-
-
-
-if __name__ == "__main__":
-    test = fetch(
-        "https://discografia.discosdobrasil.com.br/discos/"
-        "e-a-gente-nem-deu-nome"
-    )
-    test2 = scrape_cards(test)
-    test3 = scrape_next_page_link(test)
-    test4 = scrape_disco(test)
-    print(test4)
+    print(list_discs)
+    time.sleep(5)
+    return list_discs
